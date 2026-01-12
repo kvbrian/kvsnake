@@ -97,3 +97,97 @@ body {
 .swatch.food {
   background: #f25f5c;
 }
+ codex/outline-steps-to-create-web-game-0uii2p
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgba(6, 10, 10, 0.82);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+.overlay.is-visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.overlay-card {
+  width: min(90vw, 420px);
+  background: #111c1b;
+  border: 2px solid #3f5e58;
+  padding: 24px;
+  display: grid;
+  gap: 16px;
+  text-align: center;
+}
+
+.overlay-section.is-hidden {
+  display: none;
+}
+
+.overlay-score {
+  font-size: 0.9rem;
+  color: #d4f8d4;
+}
+
+.score-form {
+  display: grid;
+  gap: 12px;
+  justify-items: center;
+}
+
+.score-form label {
+  font-size: 0.55rem;
+  color: #b6c9c4;
+}
+
+.score-form input {
+  width: min(240px, 80%);
+  padding: 8px 10px;
+  text-align: center;
+  border: 1px solid #2f524b;
+  background: #0e1413;
+  color: #f4f7f4;
+  font-size: 0.7rem;
+}
+
+.score-form button,
+.overlay-actions button {
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  padding: 8px 12px;
+  border: 1px solid #3f5e58;
+  background: #1b2a27;
+  color: #f4f7f4;
+  cursor: pointer;
+}
+
+.overlay-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
+
+.leaderboard {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+  font-size: 0.6rem;
+}
+
+.leaderboard li {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 6px 10px;
+  background: #0f1715;
+  border: 1px solid #263c37;
+}
+
+ main

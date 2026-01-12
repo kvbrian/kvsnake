@@ -2,9 +2,25 @@ const canvas = document.querySelector("#game");
 const ctx = canvas.getContext("2d");
 const scoreEl = document.querySelector("#score");
 const statusEl = document.querySelector("#status");
+codex/outline-steps-to-create-web-game-0uii2p
+const overlayEl = document.querySelector("#overlay");
+const gameOverView = document.querySelector("#game-over-view");
+const leaderboardView = document.querySelector("#leaderboard-view");
+const finalScoreEl = document.querySelector("#final-score");
+const leaderboardList = document.querySelector("#leaderboard-list");
+const scoreForm = document.querySelector("#score-form");
+const playerNameInput = document.querySelector("#player-name");
+const playAgainButton = document.querySelector("#play-again");
+const closeOverlayButton = document.querySelector("#close-overlay");
 
 const gridSize = 20;
 const tileCount = canvas.width / gridSize;
+const leaderboardKey = "nokia-snake-leaderboard";
+
+
+const gridSize = 20;
+const tileCount = canvas.width / gridSize;
+ main
 
 const state = {
   snake: [
@@ -90,6 +106,66 @@ function setStatus(text) {
   statusEl.textContent = text;
 }
 
+ codex/outline-steps-to-create-web-game-0uii2p
+function loadLeaderboard() {
+  const raw = window.localStorage.getItem(leaderboardKey);
+  if (!raw) {
+    return [];
+  }
+  try {
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (error) {
+    return [];
+  }
+}
+
+function saveLeaderboard(entries) {
+  window.localStorage.setItem(leaderboardKey, JSON.stringify(entries));
+}
+
+function renderLeaderboard(entries) {
+  leaderboardList.innerHTML = "";
+  const display = entries.slice(0, 10);
+  if (display.length === 0) {
+    const empty = document.createElement("li");
+    empty.textContent = "No scores yet.";
+    leaderboardList.appendChild(empty);
+    return;
+  }
+
+  display.forEach((entry, index) => {
+    const item = document.createElement("li");
+    const name = document.createElement("span");
+    const score = document.createElement("span");
+    name.textContent = `${index + 1}. ${entry.name}`;
+    score.textContent = entry.score;
+    item.append(name, score);
+    leaderboardList.appendChild(item);
+  });
+}
+
+function showOverlay(section) {
+  overlayEl.classList.add("is-visible");
+  overlayEl.setAttribute("aria-hidden", "false");
+  if (section === "leaderboard") {
+    gameOverView.classList.add("is-hidden");
+    leaderboardView.classList.remove("is-hidden");
+  } else {
+    leaderboardView.classList.add("is-hidden");
+    gameOverView.classList.remove("is-hidden");
+  }
+}
+
+function hideOverlay() {
+  overlayEl.classList.remove("is-visible");
+  overlayEl.setAttribute("aria-hidden", "true");
+  gameOverView.classList.remove("is-hidden");
+  leaderboardView.classList.add("is-hidden");
+}
+
+
+ main
 function tick() {
   if (!state.running) {
     return;
@@ -156,6 +232,10 @@ function resetGame() {
   updateScore();
   placeFood();
   setStatus("Ready");
+ codex/outline-steps-to-create-web-game-0uii2p
+  hideOverlay();
+
+ main
   render();
 }
 
@@ -165,6 +245,12 @@ function gameOver() {
   window.clearInterval(state.timerId);
   state.timerId = null;
   setStatus("Game Over");
+ codex/outline-steps-to-create-web-game-0uii2p
+  finalScoreEl.textContent = `Score: ${state.score}`;
+  showOverlay("game-over");
+  playerNameInput.focus();
+
+ main
   render();
 }
 
@@ -201,6 +287,12 @@ function handleDirectionChange(key) {
 }
 
 window.addEventListener("keydown", (event) => {
+ codex/outline-steps-to-create-web-game-0uii2p
+  if (overlayEl.classList.contains("is-visible")) {
+    return;
+  }
+
+ main
   if (event.code === "Space") {
     if (state.running) {
       pauseGame();
@@ -218,4 +310,31 @@ window.addEventListener("keydown", (event) => {
   handleDirectionChange(event.key);
 });
 
+ codex/outline-steps-to-create-web-game-0uii2p
+scoreForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+  const name = playerNameInput.value.trim().toUpperCase() || "PLAYER";
+  const entries = loadLeaderboard();
+  const nextEntries = [
+    ...entries,
+    { name, score: state.score, date: Date.now() },
+  ].sort((a, b) => b.score - a.score);
+  saveLeaderboard(nextEntries.slice(0, 10));
+  renderLeaderboard(nextEntries);
+  playerNameInput.value = "";
+  showOverlay("leaderboard");
+});
+
+playAgainButton.addEventListener("click", () => {
+  resetGame();
+  startGame();
+});
+
+closeOverlayButton.addEventListener("click", () => {
+  hideOverlay();
+});
+
+renderLeaderboard(loadLeaderboard());
+
+ main
 render();
