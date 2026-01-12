@@ -2,6 +2,7 @@ const canvas = document.querySelector("#game");
 const ctx = canvas.getContext("2d");
 const scoreEl = document.querySelector("#score");
 const statusEl = document.querySelector("#status");
+codex/outline-steps-to-create-web-game-0uii2p
 const overlayEl = document.querySelector("#overlay");
 const gameOverView = document.querySelector("#game-over-view");
 const leaderboardView = document.querySelector("#leaderboard-view");
@@ -15,6 +16,11 @@ const closeOverlayButton = document.querySelector("#close-overlay");
 const gridSize = 20;
 const tileCount = canvas.width / gridSize;
 const leaderboardKey = "nokia-snake-leaderboard";
+
+
+const gridSize = 20;
+const tileCount = canvas.width / gridSize;
+ main
 
 const state = {
   snake: [
@@ -100,6 +106,7 @@ function setStatus(text) {
   statusEl.textContent = text;
 }
 
+ codex/outline-steps-to-create-web-game-0uii2p
 function loadLeaderboard() {
   const raw = window.localStorage.getItem(leaderboardKey);
   if (!raw) {
@@ -157,6 +164,8 @@ function hideOverlay() {
   leaderboardView.classList.add("is-hidden");
 }
 
+
+ main
 function tick() {
   if (!state.running) {
     return;
@@ -223,7 +232,10 @@ function resetGame() {
   updateScore();
   placeFood();
   setStatus("Ready");
+ codex/outline-steps-to-create-web-game-0uii2p
   hideOverlay();
+
+ main
   render();
 }
 
@@ -233,9 +245,12 @@ function gameOver() {
   window.clearInterval(state.timerId);
   state.timerId = null;
   setStatus("Game Over");
+ codex/outline-steps-to-create-web-game-0uii2p
   finalScoreEl.textContent = `Score: ${state.score}`;
   showOverlay("game-over");
   playerNameInput.focus();
+
+ main
   render();
 }
 
@@ -272,9 +287,12 @@ function handleDirectionChange(key) {
 }
 
 window.addEventListener("keydown", (event) => {
+ codex/outline-steps-to-create-web-game-0uii2p
   if (overlayEl.classList.contains("is-visible")) {
     return;
   }
+
+ main
   if (event.code === "Space") {
     if (state.running) {
       pauseGame();
@@ -292,6 +310,7 @@ window.addEventListener("keydown", (event) => {
   handleDirectionChange(event.key);
 });
 
+ codex/outline-steps-to-create-web-game-0uii2p
 scoreForm.addEventListener("submit", (event) => {
   event.preventDefault();
   const name = playerNameInput.value.trim().toUpperCase() || "PLAYER";
@@ -316,4 +335,6 @@ closeOverlayButton.addEventListener("click", () => {
 });
 
 renderLeaderboard(loadLeaderboard());
+
+ main
 render();
