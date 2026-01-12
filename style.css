@@ -25,6 +25,10 @@ body {
   border: 4px solid #2a4a45;
   background: #101616;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.35);
+ codex/outline-steps-to-create-web-game-hmxpgr
+  position: relative;
+
+ main
 }
 
 .hud {
@@ -60,7 +64,7 @@ body {
 }
 
 #game {
-  display: block;
+  display: block;     
   width: 100%;
   height: auto;
   background: #0f1d1b;
@@ -97,10 +101,16 @@ body {
 .swatch.food {
   background: #f25f5c;
 }
+ codex/outline-steps-to-create-web-game-hmxpgr
+
+.overlay {
+  position: absolute;
+
  codex/outline-steps-to-create-web-game-0uii2p
 
 .overlay {
   position: fixed;
+ main
   inset: 0;
   display: grid;
   place-items: center;
@@ -108,6 +118,10 @@ body {
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.2s ease;
+ codex/outline-steps-to-create-web-game-hmxpgr
+  z-index: 5;
+
+ main
 }
 
 .overlay.is-visible {
@@ -189,5 +203,8 @@ body {
   background: #0f1715;
   border: 1px solid #263c37;
 }
+ codex/outline-steps-to-create-web-game-hmxpgr
 
+
+ main
  main
