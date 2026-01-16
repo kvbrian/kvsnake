@@ -14,9 +14,12 @@ const retryGameButton = document.querySelector("#retry-game");
 const playAgainButton = document.querySelector("#play-again");
 const closeOverlayButton = document.querySelector("#close-overlay");
 
+// Supabase 설정
+const SUPABASE_URL = "https://ihnvvukdypxrczosizig.supabase.co";
+const SUPABASE_KEY = "sb_publishable_XG_guME9wa3pyA6ChNGvNA_oXuTg7Q5";
+
 const gridSize = 20;
 const tileCount = canvas.width / gridSize;
-const leaderboardKey = "nokia-snake-leaderboard";
 
 const state = {
   snake: [
@@ -101,21 +104,46 @@ function updateScore() {
 function setStatus(text) {
   statusEl.textContent = text;
 }
-function loadLeaderboard() {
-  const raw = window.localStorage.getItem(leaderboardKey);
-  if (!raw) {
-    return [];
-  }
+
+// Supabase에서 리더보드 불러오기
+async function loadLeaderboard() {
   try {
-    const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed : [];
+    const response = await fetch(
+      `${SUPABASE_URL}/rest/v1/leaderboard?select=name,score&order=score.desc&limit=10`,
+      {
+        headers: {
+          apikey: SUPABASE_KEY,
+          Authorization: `Bearer ${SUPABASE_KEY}`,
+        },
+      }
+    );
+    if (!response.ok) {
+      return [];
+    }
+    return await response.json();
   } catch (error) {
+    console.error("Failed to load leaderboard:", error);
     return [];
   }
 }
 
-function saveLeaderboard(entries) {
-  window.localStorage.setItem(leaderboardKey, JSON.stringify(entries));
+// Supabase에 점수 저장하기
+async function saveScore(name, score) {
+  try {
+    const response = await fetch(`${SUPABASE_URL}/rest/v1/leaderboard`, {
+      method: "POST",
+      headers: {
+        apikey: SUPABASE_KEY,
+        Authorization: `Bearer ${SUPABASE_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ name, score }),
+    });
+    return response.ok;
+  } catch (error) {
+    console.error("Failed to save score:", error);
+    return false;
+  }
 }
 
 function renderLeaderboard(entries) {
@@ -157,6 +185,7 @@ function hideOverlay() {
   gameOverView.classList.remove("is-hidden");
   leaderboardView.classList.add("is-hidden");
 }
+
 function tick() {
   if (!state.running) {
     return;
@@ -260,6 +289,11 @@ function handleDirectionChange(key) {
   const newDirection = directionMap[key];
   if (!newDirection) {
     return;
+  }
+
+  const isOpposite =
+    newDirection.x === -state.direction.x && newDirection.y === -state.direction.y;
+  if (isOpposite) {
     return;
   }
 
@@ -267,18 +301,10 @@ function handleDirectionChange(key) {
 }
 
 window.addEventListener("keydown", (event) => {
- codex/outline-steps-to-create-web-game-hmxpgr
   if (overlayEl.classList.contains("is-visible")) {
     return;
   }
 
- codex/outline-steps-to-create-web-game-0uii2p
-  if (overlayEl.classList.contains("is-visible")) {
-    return;
-  }
-
- main
- main
   if (event.code === "Space") {
     if (state.running) {
       pauseGame();
@@ -296,20 +322,16 @@ window.addEventListener("keydown", (event) => {
   handleDirectionChange(event.key);
 });
 
- codex/outline-steps-to-create-web-game-hmxpgr
-
- codex/outline-steps-to-create-web-game-0uii2p
- main
-scoreForm.addEventListener("submit", (event) => {
+scoreForm.addEventListener("submit", async (event) => {
   event.preventDefault();
   const name = playerNameInput.value.trim().toUpperCase() || "PLAYER";
-  const entries = loadLeaderboard();
-  const nextEntries = [
-    ...entries,
-    { name, score: state.score, date: Date.now() },
-  ].sort((a, b) => b.score - a.score);
-  saveLeaderboard(nextEntries.slice(0, 10));
-  renderLeaderboard(nextEntries);
+
+  // Supabase에 점수 저장
+  await saveScore(name, state.score);
+
+  // 리더보드 새로 불러오기
+  const entries = await loadLeaderboard();
+  renderLeaderboard(entries);
   playerNameInput.value = "";
   showOverlay("leaderboard");
 });
@@ -318,8 +340,6 @@ playAgainButton.addEventListener("click", () => {
   resetGame();
   startGame();
 });
-
- codex/outline-steps-to-create-web-game-hmxpgr
 
 retryGameButton.addEventListener("click", () => {
   resetGame();
@@ -330,5 +350,6 @@ closeOverlayButton.addEventListener("click", () => {
   hideOverlay();
 });
 
-renderLeaderboard(loadLeaderboard());
+// 초기화: 리더보드 불러오기
+loadLeaderboard().then(renderLeaderboard);
 render();
