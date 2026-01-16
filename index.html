@@ -1,7 +1,7 @@
 <!doctype html>
-<html lang="ko">
+<html lang="en">
   <head>
-    <meta charset="UTF-8" />
+    <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Nokia Snake</title>
     <link rel="stylesheet" href="style.css" />
@@ -11,17 +11,15 @@
       <header class="hud">
         <h1>Nokia Snake</h1>
         <div class="stats">
-          <span id="score">Score: 0</span>
-          <span id="status">Ready</span>
+          <div id="score">Score: 0</div>
+          <div id="status">Ready</div>
         </div>
-        <p class="instructions">
-          Arrow keys to move · Space to start/pause · R to restart
-        </p>
+        <p class="instructions">Arrow keys: move • Space: start/pause • R: reset</p>
       </header>
 
-      <section class="board-wrap">
-        <canvas id="game" width="400" height="400" aria-label="Snake game board"></canvas>
-      </section>
+      <div class="board-wrap">
+        <canvas id="game" width="400" height="400"></canvas>
+      </div>
 
       <footer class="legend">
         <div class="pill">
@@ -33,7 +31,7 @@
           Food
         </div>
       </footer>
- codex/outline-steps-to-create-web-game-hmxpgr
+
       <div class="overlay" id="overlay" aria-hidden="true">
         <div class="overlay-card" role="dialog" aria-live="polite">
           <div class="overlay-section" id="game-over-view">
@@ -68,43 +66,6 @@
       </div>
     </main>
 
-
-    </main>
-
- codex/outline-steps-to-create-web-game-0uii2p
-    <div class="overlay" id="overlay" aria-hidden="true">
-      <div class="overlay-card" role="dialog" aria-live="polite">
-        <div class="overlay-section" id="game-over-view">
-          <h2>Game Over</h2>
-          <p class="overlay-score" id="final-score">Score: 0</p>
-          <form id="score-form" class="score-form">
-            <label for="player-name">Name</label>
-            <input
-              id="player-name"
-              name="player-name"
-              maxlength="12"
-              placeholder="PLAYER"
-              autocomplete="off"
-              required
-            />
-            <button type="submit">Save Score</button>
-          </form>
-        </div>
-
-        <div class="overlay-section is-hidden" id="leaderboard-view">
-          <h2>Leaderboard</h2>
-          <ol class="leaderboard" id="leaderboard-list"></ol>
-          <div class="overlay-actions">
-            <button type="button" id="play-again">Play Again</button>
-            <button type="button" id="close-overlay">Close</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-
- main
- main
     <script src="script.js"></script>
   </body>
 </html>

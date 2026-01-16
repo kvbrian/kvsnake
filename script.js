@@ -2,10 +2,7 @@ const canvas = document.querySelector("#game");
 const ctx = canvas.getContext("2d");
 const scoreEl = document.querySelector("#score");
 const statusEl = document.querySelector("#status");
- codex/outline-steps-to-create-web-game-hmxpgr
 
-codex/outline-steps-to-create-web-game-0uii2p
- main
 const overlayEl = document.querySelector("#overlay");
 const gameOverView = document.querySelector("#game-over-view");
 const leaderboardView = document.querySelector("#leaderboard-view");
@@ -13,10 +10,7 @@ const finalScoreEl = document.querySelector("#final-score");
 const leaderboardList = document.querySelector("#leaderboard-list");
 const scoreForm = document.querySelector("#score-form");
 const playerNameInput = document.querySelector("#player-name");
- codex/outline-steps-to-create-web-game-hmxpgr
 const retryGameButton = document.querySelector("#retry-game");
-
- main
 const playAgainButton = document.querySelector("#play-again");
 const closeOverlayButton = document.querySelector("#close-overlay");
 
@@ -24,14 +18,6 @@ const gridSize = 20;
 const tileCount = canvas.width / gridSize;
 const leaderboardKey = "nokia-snake-leaderboard";
 
- codex/outline-steps-to-create-web-game-hmxpgr
-
-
-const gridSize = 20;
-const tileCount = canvas.width / gridSize;
- main
-
- main
 const state = {
   snake: [
     { x: 8, y: 10 },
@@ -115,11 +101,6 @@ function updateScore() {
 function setStatus(text) {
   statusEl.textContent = text;
 }
-
- codex/outline-steps-to-create-web-game-hmxpgr
-
- codex/outline-steps-to-create-web-game-0uii2p
- main
 function loadLeaderboard() {
   const raw = window.localStorage.getItem(leaderboardKey);
   if (!raw) {
@@ -176,12 +157,6 @@ function hideOverlay() {
   gameOverView.classList.remove("is-hidden");
   leaderboardView.classList.add("is-hidden");
 }
-
- codex/outline-steps-to-create-web-game-hmxpgr
-
-
- main
- main
 function tick() {
   if (!state.running) {
     return;
@@ -248,14 +223,7 @@ function resetGame() {
   updateScore();
   placeFood();
   setStatus("Ready");
-codex/outline-steps-to-create-web-game-hmxpgr
   hideOverlay();
-
- codex/outline-steps-to-create-web-game-0uii2p
-  hideOverlay();
-
- main
- main
   render();
 }
 
@@ -265,18 +233,9 @@ function gameOver() {
   window.clearInterval(state.timerId);
   state.timerId = null;
   setStatus("Game Over");
- codex/outline-steps-to-create-web-game-hmxpgr
   finalScoreEl.textContent = `Score: ${state.score}`;
   showOverlay("game-over");
   playerNameInput.focus();
-
- codex/outline-steps-to-create-web-game-0uii2p
-  finalScoreEl.textContent = `Score: ${state.score}`;
-  showOverlay("game-over");
-  playerNameInput.focus();
-
- main
- main
   render();
 }
 
@@ -301,11 +260,6 @@ function handleDirectionChange(key) {
   const newDirection = directionMap[key];
   if (!newDirection) {
     return;
-  }
-
-  const isOpposite =
-    newDirection.x === -state.direction.x && newDirection.y === -state.direction.y;
-  if (isOpposite) {
     return;
   }
 
@@ -366,20 +320,15 @@ playAgainButton.addEventListener("click", () => {
 });
 
  codex/outline-steps-to-create-web-game-hmxpgr
+
 retryGameButton.addEventListener("click", () => {
   resetGame();
+  startGame();
 });
 
-
- main
 closeOverlayButton.addEventListener("click", () => {
   hideOverlay();
 });
 
 renderLeaderboard(loadLeaderboard());
- codex/outline-steps-to-create-web-game-hmxpgr
-
-
- main
- main
 render();
