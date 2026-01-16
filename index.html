@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
     <title>KV Snake</title>
     <link rel="stylesheet" href="style.css" />
   </head>
@@ -14,11 +14,34 @@
           <div id="score">Score: 0</div>
           <div id="status">Ready</div>
         </div>
-        <p class="instructions">Arrow keys: move • Space: start/pause • R: reset</p>
+        <p class="instructions" id="instructions">Arrow keys: move • Space: start/pause • R: reset</p>
       </header>
 
-      <div class="board-wrap">
-        <canvas id="game" width="400" height="400"></canvas>
+      <div id="game-area">
+        <div class="board-wrap">
+          <canvas id="game" width="400" height="400"></canvas>
+        </div>
+      </div>
+
+      <!-- Mobile Controls -->
+      <div id="mobile-controls">
+        <button type="button" id="btn-pause" aria-label="Pause/Play">
+          <span class="icon-pause">⏸</span>
+          <span class="icon-play">▶</span>
+        </button>
+        <button type="button" id="btn-reset" aria-label="Reset">↻</button>
+        <button type="button" id="btn-toggle-controls" aria-label="Toggle control mode">
+          <span class="icon-swipe">👆</span>
+          <span class="icon-dpad">✛</span>
+        </button>
+      </div>
+
+      <!-- D-pad (hidden by default, shown when toggled) -->
+      <div id="dpad" class="is-hidden">
+        <button type="button" class="dpad-btn dpad-up" data-direction="ArrowUp" aria-label="Up">▲</button>
+        <button type="button" class="dpad-btn dpad-left" data-direction="ArrowLeft" aria-label="Left">◀</button>
+        <button type="button" class="dpad-btn dpad-right" data-direction="ArrowRight" aria-label="Right">▶</button>
+        <button type="button" class="dpad-btn dpad-down" data-direction="ArrowDown" aria-label="Down">▼</button>
       </div>
 
       <footer class="legend">

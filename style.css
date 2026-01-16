@@ -15,6 +15,7 @@ body {
   display: grid;
   place-items: center;
   background: radial-gradient(circle at top, #1c2a2a, #0b0f0f 60%);
+  overscroll-behavior: none;
 }
 
 .app {
@@ -189,4 +190,168 @@ body {
   padding: 6px 10px;
   background: #0f1715;
   border: 1px solid #263c37;
+}
+
+#game-area {
+  touch-action: none;
+  overscroll-behavior: contain;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+#mobile-controls {
+  display: none;
+  gap: 12px;
+  justify-content: center;
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+
+#mobile-controls button {
+  width: 60px;
+  height: 60px;
+  border-radius: 16px;
+  background: rgba(30, 40, 38, 0.9);
+  color: #f4f7f4;
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  font-size: 22px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.1s, border-color 0.1s, background 0.1s;
+}
+
+#mobile-controls button:active {
+  transform: scale(0.94);
+  border-color: rgba(255, 255, 255, 0.4);
+  background: rgba(50, 70, 65, 0.95);
+}
+
+#btn-pause .icon-play,
+#btn-toggle-controls .icon-dpad {
+  display: none;
+}
+
+#btn-pause.is-paused .icon-pause {
+  display: none;
+}
+
+#btn-pause.is-paused .icon-play {
+  display: inline;
+}
+
+#btn-toggle-controls.is-dpad .icon-swipe {
+  display: none;
+}
+
+#btn-toggle-controls.is-dpad .icon-dpad {
+  display: inline;
+}
+
+#dpad {
+  display: none;
+  grid-template-areas:
+    ".    up   ."
+    "left .    right"
+    ".    down .";
+  grid-template-columns: repeat(3, 56px);
+  grid-template-rows: repeat(3, 56px);
+  gap: 6px;
+  justify-content: center;
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+
+#dpad.is-hidden {
+  display: none !important;
+}
+
+#dpad.is-visible {
+  display: grid;
+}
+
+.dpad-btn {
+  width: 56px;
+  height: 56px;
+  border-radius: 12px;
+  background: rgba(30, 40, 38, 0.9);
+  color: #f4f7f4;
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.08s, border-color 0.08s, background 0.08s;
+}
+
+.dpad-btn:active {
+  transform: scale(0.92);
+  border-color: #8af28a;
+  background: rgba(60, 90, 80, 0.95);
+}
+
+.dpad-up { grid-area: up; }
+.dpad-left { grid-area: left; }
+.dpad-right { grid-area: right; }
+.dpad-down { grid-area: down; }
+
+@media (pointer: coarse), (max-width: 768px) {
+  #mobile-controls {
+    display: flex;
+  }
+
+  .instructions {
+    display: none;
+  }
+
+  .touch-hint {
+    display: block;
+    text-align: center;
+    font-size: 0.55rem;
+    color: #b6c9c4;
+    margin: 0;
+  }
+}
+
+@media (pointer: fine) and (min-width: 769px) {
+  .touch-hint {
+    display: none;
+  }
+}
+
+@media (orientation: landscape) and (pointer: coarse) {
+  .app {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    width: auto;
+    max-width: 95vw;
+    padding: 16px;
+  }
+
+  .hud {
+    order: 0;
+    min-width: 120px;
+  }
+
+  #game-area {
+    order: 1;
+  }
+
+  #mobile-controls {
+    flex-direction: column;
+    order: 2;
+    padding-bottom: 0;
+    padding-right: env(safe-area-inset-right, 0);
+  }
+
+  #dpad.is-visible {
+    order: 2;
+    padding-right: env(safe-area-inset-right, 0);
+  }
+
+  .legend {
+    display: none;
+  }
 }

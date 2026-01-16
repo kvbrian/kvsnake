@@ -14,6 +14,14 @@ const retryGameButton = document.querySelector("#retry-game");
 const playAgainButton = document.querySelector("#play-again");
 const closeOverlayButton = document.querySelector("#close-overlay");
 
+const gameAreaEl = document.querySelector("#game-area");
+const mobileControlsEl = document.querySelector("#mobile-controls");
+const btnPause = document.querySelector("#btn-pause");
+const btnReset = document.querySelector("#btn-reset");
+const btnToggleControls = document.querySelector("#btn-toggle-controls");
+const dpadEl = document.querySelector("#dpad");
+const instructionsEl = document.querySelector("#instructions");
+
 // Supabase 설정
 const SUPABASE_URL = "https://ihnvvukdypxrczosizig.supabase.co";
 const SUPABASE_KEY = "sb_publishable_XG_guME9wa3pyA6ChNGvNA_oXuTg7Q5";
@@ -29,12 +37,18 @@ const state = {
   ],
   direction: { x: 1, y: 0 },
   nextDirection: { x: 1, y: 0 },
+  directionQueue: [],
   food: { x: 13, y: 10 },
   score: 0,
   speed: 140,
   timerId: null,
   running: false,
   gameOver: false,
+};
+
+const mobileState = {
+  controlMode: localStorage.getItem("kvsnake-control-mode") || "swipe",
+  swipe: null,
 };
 
 const sounds = {
@@ -191,6 +205,9 @@ function tick() {
     return;
   }
 
+  if (state.directionQueue.length > 0) {
+    state.nextDirection = state.directionQueue.shift();
+  }
   state.direction = state.nextDirection;
   const head = state.snake[0];
   const nextHead = {
@@ -227,6 +244,7 @@ function startGame() {
   state.running = true;
   setStatus("Running");
   state.timerId = window.setInterval(tick, state.speed);
+  updatePauseButton();
 }
 
 function pauseGame() {
@@ -237,6 +255,7 @@ function pauseGame() {
   setStatus("Paused");
   window.clearInterval(state.timerId);
   state.timerId = null;
+  updatePauseButton();
 }
 
 function resetGame() {
@@ -247,12 +266,14 @@ function resetGame() {
   ];
   state.direction = { x: 1, y: 0 };
   state.nextDirection = { x: 1, y: 0 };
+  state.directionQueue = [];
   state.score = 0;
   state.gameOver = false;
   updateScore();
   placeFood();
   setStatus("Ready");
   hideOverlay();
+  updatePauseButton();
   render();
 }
 
@@ -265,6 +286,7 @@ function gameOver() {
   finalScoreEl.textContent = `Score: ${state.score}`;
   showOverlay("game-over");
   playerNameInput.focus();
+  updatePauseButton();
   render();
 }
 
@@ -274,7 +296,7 @@ function render() {
   drawSnake();
 }
 
-function handleDirectionChange(key) {
+function handleDirectionChange(key, withHaptic = false) {
   if (!state.running && !state.gameOver) {
     startGame();
   }
@@ -291,13 +313,28 @@ function handleDirectionChange(key) {
     return;
   }
 
+  const lastDirection = state.directionQueue.length > 0
+    ? state.directionQueue[state.directionQueue.length - 1]
+    : state.nextDirection;
+
   const isOpposite =
-    newDirection.x === -state.direction.x && newDirection.y === -state.direction.y;
+    newDirection.x === -lastDirection.x && newDirection.y === -lastDirection.y;
   if (isOpposite) {
     return;
   }
 
-  state.nextDirection = newDirection;
+  const isSame =
+    newDirection.x === lastDirection.x && newDirection.y === lastDirection.y;
+  if (isSame) {
+    return;
+  }
+
+  if (state.directionQueue.length < 2) {
+    state.directionQueue.push(newDirection);
+    if (withHaptic && navigator.vibrate) {
+      navigator.vibrate(10);
+    }
+  }
 }
 
 window.addEventListener("keydown", (event) => {
@@ -350,6 +387,136 @@ closeOverlayButton.addEventListener("click", () => {
   hideOverlay();
 });
 
-// 초기화: 리더보드 불러오기
+function updatePauseButton() {
+  if (state.running) {
+    btnPause.classList.remove("is-paused");
+  } else {
+    btnPause.classList.add("is-paused");
+  }
+}
+
+function getSwipeThreshold() {
+  const rect = gameAreaEl.getBoundingClientRect();
+  return Math.max(14, 0.04 * Math.min(rect.width, rect.height));
+}
+
+function initMobileControls() {
+  if (mobileState.controlMode === "dpad") {
+    btnToggleControls.classList.add("is-dpad");
+    dpadEl.classList.remove("is-hidden");
+    dpadEl.classList.add("is-visible");
+  }
+
+  if ("ontouchstart" in window || navigator.maxTouchPoints > 0) {
+    const hint = document.createElement("p");
+    hint.className = "touch-hint";
+    hint.id = "touch-hint";
+    hint.textContent = mobileState.controlMode === "dpad"
+      ? "Use D-pad to move • Tap buttons to control"
+      : "Swipe to move • Tap buttons to control";
+    instructionsEl.parentNode.insertBefore(hint, instructionsEl.nextSibling);
+  }
+
+  updatePauseButton();
+}
+
+function updateTouchHint() {
+  const hint = document.querySelector("#touch-hint");
+  if (hint) {
+    hint.textContent = mobileState.controlMode === "dpad"
+      ? "Use D-pad to move • Tap buttons to control"
+      : "Swipe to move • Tap buttons to control";
+  }
+}
+
+gameAreaEl.addEventListener("pointerdown", (e) => {
+  if (overlayEl.classList.contains("is-visible")) return;
+  if (mobileState.controlMode === "dpad") return;
+
+  mobileState.swipe = {
+    id: e.pointerId,
+    x0: e.clientX,
+    y0: e.clientY,
+    locked: false,
+    threshold: getSwipeThreshold(),
+  };
+  gameAreaEl.setPointerCapture?.(e.pointerId);
+}, { passive: true });
+
+gameAreaEl.addEventListener("pointermove", (e) => {
+  const swipe = mobileState.swipe;
+  if (!swipe || swipe.id !== e.pointerId || swipe.locked) return;
+  if (overlayEl.classList.contains("is-visible")) return;
+
+  const dx = e.clientX - swipe.x0;
+  const dy = e.clientY - swipe.y0;
+  const adx = Math.abs(dx);
+  const ady = Math.abs(dy);
+
+  if (Math.max(adx, ady) < swipe.threshold) return;
+
+  if (adx > ady) {
+    handleDirectionChange(dx > 0 ? "ArrowRight" : "ArrowLeft", true);
+  } else {
+    handleDirectionChange(dy > 0 ? "ArrowDown" : "ArrowUp", true);
+  }
+
+  swipe.locked = true;
+}, { passive: true });
+
+gameAreaEl.addEventListener("pointerup", (e) => {
+  if (mobileState.swipe && mobileState.swipe.id === e.pointerId) {
+    mobileState.swipe = null;
+  }
+}, { passive: true });
+
+gameAreaEl.addEventListener("pointercancel", () => {
+  mobileState.swipe = null;
+}, { passive: true });
+
+btnPause.addEventListener("click", () => {
+  if (overlayEl.classList.contains("is-visible")) return;
+
+  if (state.running) {
+    pauseGame();
+  } else {
+    startGame();
+  }
+  updatePauseButton();
+});
+
+btnReset.addEventListener("click", () => {
+  if (overlayEl.classList.contains("is-visible")) return;
+  resetGame();
+});
+
+btnToggleControls.addEventListener("click", () => {
+  if (mobileState.controlMode === "swipe") {
+    mobileState.controlMode = "dpad";
+    btnToggleControls.classList.add("is-dpad");
+    dpadEl.classList.remove("is-hidden");
+    dpadEl.classList.add("is-visible");
+  } else {
+    mobileState.controlMode = "swipe";
+    btnToggleControls.classList.remove("is-dpad");
+    dpadEl.classList.add("is-hidden");
+    dpadEl.classList.remove("is-visible");
+  }
+  localStorage.setItem("kvsnake-control-mode", mobileState.controlMode);
+  updateTouchHint();
+});
+
+dpadEl.addEventListener("pointerdown", (e) => {
+  const btn = e.target.closest(".dpad-btn");
+  if (!btn) return;
+  if (overlayEl.classList.contains("is-visible")) return;
+
+  const direction = btn.dataset.direction;
+  if (direction) {
+    handleDirectionChange(direction, true);
+  }
+}, { passive: true });
+
 loadLeaderboard().then(renderLeaderboard);
+initMobileControls();
 render();
